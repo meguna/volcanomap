@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Volcanos</title>
+  <style>
+    body {
+      font-size: 8px;
+    }
+    path {
+      stroke:#ff87af;
+      fill:none;
+    }
+  </style>
+</head>
+<body>
+  <script src="https://d3js.org/d3.v4.0.0-rc.2.min.js"></script>
+  <script src="https://d3js.org/topojson.v1.min.js"></script>
+  <script src="https://d3js.org/d3-geo-projection.v1.min.js"></script>
+
+  <script>
+    var svg = d3.select("body").append("svg")
+      .attr("width",1280)
+      .attr("height",800);
+
+    var projection = d3.geoRobinson()
+      .scale(150)
+      .clipExtent([[0, 0], [1280, 800]])
+      .center([0,0])
+      .rotate([0,0,0]);
+
+
+    var path = d3.geoPath()
+      .projection(projection);
+
+    d3.json("world.json", function(error, world) {
+      if (error) return console.error(error);
+
+      svg.append("path")
+        .datum(topojson.mesh(world))
+        .attr("d",path);
+
+      d3.csv("volcanolist.csv",
+        function row(d) {
+          return {
+            lat: +d.Longitude,
+            long: +d.Latitude,
+            country: d.Country,
+            type: d.PrimaryVolcanoType
+          }
+        },
+        function(error, data) {
+        if (error) return console.error(error);
+
+        console.log(data);
+        console.log(projection.center());
+
+        svg.append("g")
+          .selectAll("circle")
+            .data(data)
+          .enter().append("circle")
+            .attr("r",1)
+            .attr("transform", function(d) {if (d.type == "Stratovolcano") {return "translate(" + projection([d.lat,d.long]) + ")";} });
+
+
+
+
+
+      });
+    });
+  </script>
+</body>
+</html>

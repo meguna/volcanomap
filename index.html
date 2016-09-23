@@ -6,20 +6,43 @@
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
   <title>Volcanos</title>
   <style>
-    body {
-      font-size: 8px;
+    @font-face {
+      font-family: 'Proxima Nova';
+      src: url('fonts/proximanova-regular-webfont.woff') format('woff');
     }
-    path {
-      stroke:#ff87af;
+    body {
+      font-family: 'Proxima Nova';
+      text-align: center;
+      background-color: #e7dcda;
+    }
+
+    path.world-path {
+      stroke:#f5162a;
       fill:none;
     }
+
+    .volcano {
+      fill-opacity:0.7;
+      stroke: white;
+      stroke-width:1px;
+      stroke-opacity:0.5;
+    }
+    .volcano:hover {
+      fill-opacity:0.2;
+      transition-duration: : 0.2s;
+    }
+    .hidden {
+      visibility:hidden;
+    }
+
   </style>
 </head>
 <body>
-  <script src="https://d3js.org/d3.v4.0.0-rc.2.min.js"></script>
-  <script src="https://d3js.org/topojson.v1.min.js"></script>
-  <script src="https://d3js.org/d3-geo-projection.v1.min.js"></script>
+  <script src="scripts/d3.v4.0.0-rc.2.min.js"></script>
+  <script src="scripts/topojson.v1.min.js"></script>
+  <script src="scripts/d3-geo-projection.v1.min.js"></script>
 
+  <h1>Explore Our Planet's Volcanoes</h1>
   <script>
     var svg = d3.select("body").append("svg")
       .attr("width",1280)
@@ -40,7 +63,8 @@
 
       svg.append("path")
         .datum(topojson.mesh(world))
-        .attr("d",path);
+        .attr("d",path)
+        .attr("class","world-path");
 
       d3.csv("volcanolist.csv",
         function row(d) {
@@ -48,7 +72,9 @@
             lat: +d.Longitude,
             long: +d.Latitude,
             country: d.Country,
-            type: d.PrimaryVolcanoType
+            type: d.PrimaryVolcanoType,
+            name: d.VolcanoName,
+
           }
         },
         function(error, data) {
@@ -57,15 +83,57 @@
         console.log(data);
         console.log(projection.center());
 
+        function appendVolcano(type, fillColor, svgShape, svgDataType, svgData) {
+          svg.append("g")
+            .selectAll(svgShape)
+              .data(data)
+            .enter().append(svgShape)
+              .attr("class","volcano " + type)
+              .attr(svgDataType,svgData)
+              .attr("fill",fillColor)
+              .attr("transform", function(d) {if (d.type == type) {return "translate(" + projection([d.lat,d.long]) + ")";} })
+              .on("mouseover",mouseover);
+          };
+
+
+          appendVolcano("stratovolcano", "#8f9baf", "polygon", "points", "0,13 7.5,0 15,13 ");
+          appendVolcano("caldera", "#e2402a", "path", "d", "M2.1,0.2L0,4.6h15l-2.1-4.4c-0.1-0.3-0.5-0.3-0.6,0l-0.8,1.4c0,0-2,0.9-3.9,0.9S3.6,1.6,3.6,1.6L2.8,0.2C2.6-0.1,2.2-0.1,2.1,0.2z");
+          appendVolcano("complex", "#87ad2f", "path", "d", "M0,10.7l4.5-7.8c0.2-0.4,0.8-0.5,1.2-0.3l0.9,0.6l1.7-2.7c0.4-0.7,1.5-0.6,1.8,0.1L15,10.7H0z");
+          appendVolcano("compound", "#87ad2f", "path", "d", "M0,11.9L3.5,0.8c0.2-0.6,1-0.6,1.3-0.1l1.5,3.4c0.2,0.5,0.9,0.5,1.2,0.1l2.4-3.9c0.3-0.5,1-0.4,1.2,0.1l4,11.5H0z");
+          appendVolcano("pyroclastic-shield", "#f99b6c", "path", "d", "M0,12.5C0,12.5,4.7,0,7.5,0S15,12.5,15,12.5H0z");
+          appendVolcano("lava-cone", "#3a3745", "polygon", "points", "8.8,0 6.2,0 0,12 15,12 ");
+          appendVolcano("subglacial", "#edfffe", "polygon", "points", "0,10 15,10 15,9 10.2,0 4.8,0 3.2,5.3 0,9.3 ");
+          appendVolcano("submarine", "#17d6e9", "path", "d", "M0,13L3.5,0l2.4,0.8c0.8,0.3,1.5,0.9,1.8,1.7l0,0c0.6,1.6,2.4,2.3,4,1.6l1.1-0.5L15,13H0z");
+          appendVolcano("fissure-vent", "#ff6329", "path", "d", "M0,13c3,0,16.6-0.1,16.6-0.1s4.5-3.1,2.7-5.5C17.5,5,9.1,4.6,11.1,3.3s6.2-1.8,6.4-2.4C17.7,0.3,16.1,0,16.1,0s1.1,0.2,0.5,0.5C13.6,1.7,4.1,2,5.5,3.4s9.1,2,8.1,3.7C11.8,10.4,5.5,11.9,0,13z");
+          appendVolcano("cone", "#615342", "path", "d", "M0,11.8C3,7.9,5.5,4,6.9,0.4c0.2-0.5,0.9-0.5,1.1,0c1.4,3.8,3.8,7.6,7,11.4H0z");
+          appendVolcano("lava-dome", "#876c52", "path", "d", "M0,8.6c0,0-0.1-8.5,7.4-8.6S15,8.6,15,8.6H0z");
+          appendVolcano("shield", "#3174fc", "polygon", "points", "0,3.9 13.2,0 26.4,3.9 ");
+          appendVolcano("pyroclastic-cone", "#171d38", "polygon", "points", "9.2,0 5.8,0 0,8 15,8 ");
+          appendVolcano("maar", "#4b4744", "path", "d", "M12.1,0L12.1,0c0,0,0,0.1,0,0.1c0,0.5-2,0.9-4.6,0.9S2.9,0.6,2.9,0.1C2.9,0.1,3,0,3,0H2.9L0,5h15L12.1,0z");
+          appendVolcano("unknown", "#000", "path", "d", "M0,3.6C0,1.3,1.4,0,3.6,0c2.1,0,3.4,1,3.4,2.8c0,2.4-2.4,2.7-2.4,4.6H2.6c0-2.5,2-2.6,2-4.2c0-0.7-0.4-1-1.2-1c-0.8,0-1.2,0.5-1.3,1.5L0,3.6z M4.9,10c0,0.8-0.6,1.3-1.3,1.3c-0.8,0-1.3-0.5-1.3-1.3c0-0.8,0.5-1.3,1.3-1.3C4.4,8.7,4.9,9.3,4.9,10z");
+          appendVolcano("explosion-crater", "#4f533a", "path", "d", "M11.1,0.2C10.2,1.1,9,1.7,7.6,1.7C6.2,1.7,4.9,1,4,0L0,7h15L11.1,0.2z");
+          appendVolcano("tuff-cone", "#15360c", "polygon", "points", "3.8,0 3.1,2.6 0,6 15,6 11.9,2.6 11.2,0 ");
+          appendVolcano("volcanic-field", "#c99c83", "path", "d", "M0,5.7L1.4,2c0.6-1.6,2.5-2.2,3.9-1.3l0,0C5.9,1.1,6.7,1.2,7.4,1l2.9-0.9c1.3-0.4,2.7,0.3,3.2,1.6l1.5,4H0z");
+          appendVolcano("crater-row", "#74706e", "path", "d", "M17.2,0h-2c-0.4,0-0.7,0.3-0.8,0.7L14,2.3C14,2.7,13.6,3,13.2,3h-0.8c-0.4,0-0.7-0.3-0.8-0.7l-0.4-1.7C11.1,0.3,10.8,0,10.4,0h-2C8,0,7.7,0.3,7.6,0.7L7.3,2.3C7.2,2.7,6.8,3,6.4,3H5.6C5.2,3,4.9,2.7,4.8,2.3L4.4,0.7C4.4,0.3,4,0,3.6,0h-2C1.2,0,0.9,0.3,0.8,0.6L0,4h1.1h4.1h1.5h5.3h1.5h4h1.3L18,0.6C17.9,0.3,17.6,0,17.2,0z");
+
         svg.append("g")
-          .selectAll("circle")
+          .selectAll("rect")
             .data(data)
-          .enter().append("circle")
-            .attr("r",1)
-            .attr("transform", function(d) {if (d.type == "Stratovolcano") {return "translate(" + projection([d.lat,d.long]) + ")";} });
+          .enter().append("rect")
+            .attr("width","300px")
+            .attr("height","100px")
+            .attr("class","tooltip")
+            .classed("hidden",true);
 
+        function mouseover() {
+          console.log(this);
+          console.log(d);
+        };
 
-
+        // svg.append("g")
+        //   .selectAll("polygon, path")
+        //     .data(["stratovolcano","caldera","complex","compound","pyroclastic-shield","lava-cone","subglacial","submarine","fissure-vent","cone","lava-dome","shield","pyroclastic-cone","maar","unknown","explosion-crater","tuff-cone","volcanic-field","crater-row"])
+        //   .enter().append("path");
 
 
       });

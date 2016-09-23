@@ -11,8 +11,9 @@
       src: url('fonts/proximanova-regular-webfont.woff') format('woff');
     }
     body {
+      margin:0;
       font-family: 'Proxima Nova';
-      background-color: #e7dcda;
+      background-color: #f2e9e7;
     }
     h1 {
       text-align:center;
@@ -25,17 +26,37 @@
 
     .volcano {
       fill-opacity:0.7;
-      stroke: #ffffff;
+      stroke: #ededed;
       stroke-width:1px;
-      stroke-opacity:0.5;
+      stroke-opacity:1;
+      stroke-miterlimit:1;
     }
     .volcano:hover {
-      fill-opacity:0.2;
+      fill-opacity:1;
+      stroke-opacity:1;
+      stroke:#d4d2d2;
       transition-duration: : 0.2s;
     }
     .hidden {
       visibility:hidden;
     }
+    .explorer {
+      background-color: rgba(0, 0, 0, 0.7);
+      border-radius: 5px;
+      width: 100px;
+      height:auto;
+      z-index:10;
+      position:absolute;
+      /*margin-top:-5px;*/
+      color:white;
+      pointer-events: none;
+      word-wrap: break-word;
+      font-size: 14px;
+      padding: 6px;
+      margin-top:-30px;
+      text-align: center;
+    }
+
 
 
     .stratovolcano {
@@ -137,6 +158,7 @@
             country: d.Country,
             type: d.PrimaryVolcanoType,
             name: d.VolcanoName,
+            id: "id" + d.VolcanoNumber
 
           }
         },
@@ -151,9 +173,28 @@
               .data(data)
             .enter().append("polygon")
               .attr("class",function(d) {return "volcano " + d.type;} )
-              .attr("points","0,11.3 6.5,0 13,11.3 ")
+              .attr("id",function(d) {return d.id;})
+              .attr("points","0,13 7.5,0 15,13 ") //"0,11.3 6.5,0 13,11.3 "
               .attr("transform", function(d) {return "translate(" + projection([d.lat,d.long]) + ")";})
-              .on("mouseover",mouseover);
+              .on("mouseover", function(d){
+                console.log(this);
+                console.log(projection([d.lat,d.long])[0]);
+                console.log(d.id);
+                console.log(d3.mouse(this));
+                var x = projection([d.lat,d.long])[0];
+                var y = projection([d.lat,d.long])[1];
+                console.log(x);
+                console.log(y);
+                explorer
+                  .text(d.name + ", " + d.country)
+                  .style("left", (x + "px") )
+                  .style("top", ((y + 80)  + "px") )
+                  .classed("hidden",false)
+              })
+              .on("mouseout", function(){
+                explorer
+                  .classed("hidden",true)
+              });
 
 
           var legend = svg.append("g")
@@ -162,28 +203,41 @@
                 .data(["stratovolcano","caldera","complex","compound","pyroclastic-shield","lava-cone","subglacial","submarine","fissure-vent","cone","lava-dome","shield","pyroclastic-cone","maar","unknown","explosion-crater","tuff-cone","volcanic-field","crater-row"])
                 .enter().append("g");
 
-            legend.append("polygon")
-              .attr("class",function(d) {return "volcano " + d;} )
-              .attr("points","0,13 7.5,0 15,13 ")
-              .attr("transform",function(d,i){ return "translate(" + (30*i + 50) +", " + 520 + ")"});
+          legend.append("polygon")
+            .attr("class",function(d) {return "volcano " + d;} )
+            .attr("points","0,13 7.5,0 15,13 ")
+            .attr("transform",function(d,i){ return "translate(" + (30*i + 50) +", " + 520 + ")"});
 
-            legend.append("text")
-              .text(function(d) {var str = d; str = str.replace("-"," "); return str;})
-              .attr("transform",function(d,i){ return "translate(" + (30*i + 50) +", " + 520 + ")rotate(90)"})
-              .attr("dx",20)
-              .attr("dy",-4);
-
-
-          function mouseover() {
-            console.log(this);
-          };
-
-        // svg.append("g")
-        //   .selectAll("polygon, path")
-        //     .data(["stratovolcano","caldera","complex","compound","pyroclastic-shield","lava-cone","subglacial","submarine","fissure-vent","cone","lava-dome","shield","pyroclastic-cone","maar","unknown","explosion-crater","tuff-cone","volcanic-field","crater-row"])
-        //   .enter().append("path");
+          legend.append("text")
+            .text(function(d) {var str = d; str = str.replace("-"," "); return str;})
+            .attr("transform",function(d,i){ return "translate(" + (30*i + 50) +", " + 520 + ")rotate(90)"})
+            .attr("dx",20)
+            .attr("dy",-4);
 
 
+          var explorer = d3.select("body").append("div")
+            .attr("class","explorer")
+            .classed("hidden",true);
+
+
+
+          //
+          // function mouseover() {
+          //   console.log(this);
+          //   console.log(this.transform.animVal[0].matrix.e);
+          //   console.log(this.id);
+          //   console.log(d3.mouse(this));
+          //   var x = Math.floor(this.transform.animVal[0].matrix.e + d3.mouse(this)[0]);
+          //   var y = Math.floor(this.transform.animVal[0].matrix.f + d3.mouse(this)[1]);
+          //   console.log(x);
+          //   console.log(y);
+          //   console.log(data);
+          //   explorer
+          //     .text(x)
+          //     .style("left",(x + "px"))
+          //     .style("top", (y + "px"))
+          //     .classed("hidden",false)
+          // };
 
 
       });

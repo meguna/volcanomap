@@ -23,7 +23,14 @@
       stroke:#f5162a;
       fill:none;
     }
-
+    path.tectonic-path {
+      stroke:#1654cd;
+      stroke-width:3px;
+      stroke-dasharray:5,7;
+      stroke-linecap:round;
+      stroke-miterlimit:1;
+      fill:none;
+    }
     .volcano {
       fill-opacity:0.7;
       stroke: #ededed;
@@ -164,38 +171,37 @@
         },
         function(error, data) {
         if (error) return console.error(error);
+        svg.append("g")
+          .selectAll("polygon")
+            .data(data)
+          .enter().append("polygon")
+            .attr("class",function(d) {return "volcano " + d.type;} )
+            .attr("id",function(d) {return d.id;})
+            .attr("points","0,13 7.5,0 15,13 ") //"0,11.3 6.5,0 13,11.3 "
+            .attr("transform", function(d) {return "translate(" + projection([d.lat,d.long]) + ")";})
+            .on("mouseover", function(d){
+              console.log(this);
+              console.log(projection([d.lat,d.long])[0]);
+              console.log(d.id);
+              console.log(d3.mouse(this));
+              var x = projection([d.lat,d.long])[0];
+              var y = projection([d.lat,d.long])[1];
+              console.log(x);
+              console.log(y);
+              explorer
+                .text(d.name + ", " + d.country)
+                .style("left", (x + "px") )
+                .style("top", ((y + 80)  + "px") )
+                .classed("hidden",false)
+            })
+            .on("mouseout", function(){
+              explorer
+                .classed("hidden",true)
+            });
 
-        console.log(data);
-        console.log(projection.center());
-
-          svg.append("g")
-            .selectAll("polygon")
-              .data(data)
-            .enter().append("polygon")
-              .attr("class",function(d) {return "volcano " + d.type;} )
-              .attr("id",function(d) {return d.id;})
-              .attr("points","0,13 7.5,0 15,13 ") //"0,11.3 6.5,0 13,11.3 "
-              .attr("transform", function(d) {return "translate(" + projection([d.lat,d.long]) + ")";})
-              .on("mouseover", function(d){
-                console.log(this);
-                console.log(projection([d.lat,d.long])[0]);
-                console.log(d.id);
-                console.log(d3.mouse(this));
-                var x = projection([d.lat,d.long])[0];
-                var y = projection([d.lat,d.long])[1];
-                console.log(x);
-                console.log(y);
-                explorer
-                  .text(d.name + ", " + d.country)
-                  .style("left", (x + "px") )
-                  .style("top", ((y + 80)  + "px") )
-                  .classed("hidden",false)
-              })
-              .on("mouseout", function(){
-                explorer
-                  .classed("hidden",true)
-              });
-
+          var explorer = d3.select("body").append("div")
+            .attr("class","explorer")
+            .classed("hidden",true);
 
           var legend = svg.append("g")
             .attr("class","legend")
@@ -214,32 +220,16 @@
             .attr("dx",20)
             .attr("dy",-4);
 
+          d3.json("tectonic.json",function(error, tectonic) {
+            if (error) return console.error(error);
 
-          var explorer = d3.select("body").append("div")
-            .attr("class","explorer")
-            .classed("hidden",true);
+            svg.append("path")
+            .datum(topojson.mesh(tectonic))
+            .attr("d",path)
+            .attr("class","tectonic-path");
+          });
 
-
-
-          //
-          // function mouseover() {
-          //   console.log(this);
-          //   console.log(this.transform.animVal[0].matrix.e);
-          //   console.log(this.id);
-          //   console.log(d3.mouse(this));
-          //   var x = Math.floor(this.transform.animVal[0].matrix.e + d3.mouse(this)[0]);
-          //   var y = Math.floor(this.transform.animVal[0].matrix.f + d3.mouse(this)[1]);
-          //   console.log(x);
-          //   console.log(y);
-          //   console.log(data);
-          //   explorer
-          //     .text(x)
-          //     .style("left",(x + "px"))
-          //     .style("top", (y + "px"))
-          //     .classed("hidden",false)
-          // };
-
-
+          
       });
     });
   </script>

@@ -15,6 +15,17 @@
       font-family: 'Proxima Nova';
       background-color: #f2e9e7;
     }
+    a {
+      text-decoration: none;
+      color:black;
+      border-bottom: 2px solid #4f5257;
+      box-sizing: border-box;
+      -moz-box-sizing: border-box;
+    }
+    a:hover {
+      color:#f5162a;
+      transition:0.1s;
+    }
     h1 {
       text-align:center;
       font-size: 2.5em;
@@ -71,6 +82,7 @@
       position:absolute;
       border-left: 2px solid #f5162a;
       padding-left:10px;
+      padding-right: 100px;
     }
     input[type=range]::-moz-focus-inner {
       border:0;
@@ -96,7 +108,7 @@
     }
     input[type=range]:active::-moz-range-thumb {
       background: #4399f4;
-      border: #3d8add; 
+      border: #3d8add;
     }
 
 
@@ -176,6 +188,9 @@
       <input value="0" id="elevationSlider" type="range" min="-4200" max="6800" step="200" oninput="elevMinOut.value = elevationSlider.value">
       <output id="elevMinOut">0</output>
     </form>
+
+    <p>The volcanic data was provided by the Smithsonian Institution's <a href="http://volcano.si.edu/">Global Volcanism Program website</a>.</p>
+    <p>Geographic data was retreived from <a href="http://www.naturalearthdata.com/">Natural Earth</a>, and tectonic data was retrieved from Hugo Ahlenius's <a href="https://github.com/fraxen/tectonicplates">Tectonic Plates project</a> on github.</p>
   </div>
 
   <script>

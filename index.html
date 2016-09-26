@@ -23,6 +23,9 @@
       stroke:#f5162a;
       fill:none;
     }
+    #tectonic-path {
+      fill:none;
+    }
     path.tectonic-path {
       stroke:#1654cd;
       stroke-width:3px;
@@ -63,7 +66,38 @@
       margin-top:-30px;
       text-align: center;
     }
-
+    #controlbox{
+      left:1100px;
+      position:absolute;
+      border-left: 2px solid #f5162a;
+      padding-left:10px;
+    }
+    input[type=range]::-moz-focus-inner {
+      border:0;
+      outline:0;
+    }
+    input[type=range]:focus{
+      outline:0;
+    }
+    input[type=range]::-webkit-slider-runnable-track {
+      width:300px;
+    }
+    input[type=range]::-moz-range-track {
+      height:4px;
+      border-radius: 3px;
+      background: #a0b5c2;
+    }
+    input[type=range]::-moz-range-thumb {
+      border: 1px solid #5c6263;
+      height:15px;
+      width:15px;
+      border-radius: 50%;
+      background: #686f71;
+    }
+    input[type=range]:active::-moz-range-thumb {
+      background: #4399f4;
+      border: #3d8add; 
+    }
 
 
     .stratovolcano {
@@ -131,6 +165,19 @@
   <script src="scripts/d3-geo-projection.v1.min.js"></script>
 
   <h1>Explore Our Planet's Volcanoes</h1>
+
+  <div id="controlbox">
+
+    <form>
+      <p>Tectonic Layer</p>
+      <input type="checkbox" id="tectonic-check" />
+
+      <p>Filter By Minimum Elevation</p>
+      <input value="0" id="elevationSlider" type="range" min="-4200" max="6800" step="200" oninput="elevMinOut.value = elevationSlider.value">
+      <output id="elevMinOut">0</output>
+    </form>
+  </div>
+
   <script>
     var width = 1280,
     height = 700;
@@ -144,7 +191,6 @@
       .clipExtent([[0, 0], [1280, 800]])
       .center([0,0])
       .rotate([0,0,0]);
-
 
     var path = d3.geoPath()
       .projection(projection);
@@ -165,8 +211,8 @@
             country: d.Country,
             type: d.PrimaryVolcanoType,
             name: d.VolcanoName,
-            id: "id" + d.VolcanoNumber
-
+            id: "id" + d.VolcanoNumber,
+            elev: +d.Elevation
           }
         },
         function(error, data) {
@@ -180,16 +226,16 @@
             .attr("points","0,13 7.5,0 15,13 ") //"0,11.3 6.5,0 13,11.3 "
             .attr("transform", function(d) {return "translate(" + projection([d.lat,d.long]) + ")";})
             .on("mouseover", function(d){
-              console.log(this);
-              console.log(projection([d.lat,d.long])[0]);
-              console.log(d.id);
-              console.log(d3.mouse(this));
+              // console.log(this);
+              // console.log(projection([d.lat,d.long])[0]);
+              // console.log(d.id);
+              // console.log(d3.mouse(this));
               var x = projection([d.lat,d.long])[0];
               var y = projection([d.lat,d.long])[1];
-              console.log(x);
-              console.log(y);
+              // console.log(x);
+              // console.log(y);
               explorer
-                .text(d.name + ", " + d.country)
+                .text(d.name + ", " + d.country + " (" + d.elev + "m)")
                 .style("left", (x + "px") )
                 .style("top", ((y + 80)  + "px") )
                 .classed("hidden",false)
@@ -223,13 +269,39 @@
           d3.json("tectonic.json",function(error, tectonic) {
             if (error) return console.error(error);
 
-            svg.append("path")
-            .datum(topojson.mesh(tectonic))
-            .attr("d",path)
-            .attr("class","tectonic-path");
+            var tectonicLayer = svg.append("g")
+              .attr("class","tectonic-layer");
+
+            tectonicLayer.append("path")
+              .datum(topojson.mesh(tectonic))
+              .attr("d",path)
+              .attr("id","tectonic-path");
           });
 
-          
+          d3.select("#tectonic-check")
+            .property("disabled", false)
+            .on("change", function(){d3.select("#tectonic-path").classed("tectonic-path", this.checked)});
+
+          d3.select("#elevationSlider")
+            .on("input", function() {
+              // console.log(this.value);
+              var elevation = this.value;
+              d3.selectAll(".volcano")
+                .each(function(d) {
+                  // console.log(d.elev);
+                  // console.log(elevation);
+                  if (d.elev <= elevation) {
+                    console.log(d.id);
+                    d3.select("#" + d.id).classed("hidden",true);
+                  }
+                  else {
+                    d3.select("#" + d.id).classed("hidden",false);
+                  }
+
+                })
+            });
+
+
       });
     });
   </script>

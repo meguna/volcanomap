@@ -1,0 +1,163 @@
+@font-face {
+  font-family: 'Proxima Nova';
+  src: url('fonts/proximanova-regular-webfont.woff') format('woff');
+}
+body {
+  margin:0;
+  font-family: 'Proxima Nova';
+  background-color: #f2e9e7;
+}
+a {
+  text-decoration: none;
+  color:black;
+  border-bottom: 2px solid #4f5257;
+  box-sizing: border-box;
+  -moz-box-sizing: border-box;
+}
+a:hover {
+  color:#f5162a;
+  transition:0.1s;
+}
+h1 {
+  text-align:center;
+  font-size: 2.5em;
+}
+path.world-path {
+  stroke:#f5162a;
+  fill:none;
+}
+#tectonic-path {
+  fill:none;
+}
+path.tectonic-path {
+  stroke:#1654cd;
+  stroke-width:3px;
+  stroke-dasharray:5,7;
+  stroke-linecap:round;
+  stroke-miterlimit:1;
+  fill:none;
+}
+.volcano {
+  fill-opacity:0.7;
+  stroke: #ededed;
+  stroke-width:1px;
+  stroke-opacity:1;
+  stroke-miterlimit:1;
+}
+.volcano:hover {
+  fill-opacity:1;
+  stroke-opacity:1;
+  stroke:#d4d2d2;
+  transition-duration: : 0.2s;
+}
+.hidden {
+  visibility:hidden;
+}
+.explorer {
+  background-color: rgba(0, 0, 0, 0.7);
+  border-radius: 5px;
+  width: 100px;
+  height:auto;
+  z-index:10;
+  position:absolute;
+  /*margin-top:-5px;*/
+  color:white;
+  pointer-events: none;
+  word-wrap: break-word;
+  font-size: 14px;
+  padding: 6px;
+  margin-top:-30px;
+  text-align: center;
+}
+#controlbox{
+  left:1100px;
+  position:absolute;
+  border-left: 2px solid #f5162a;
+  padding-left:10px;
+  padding-right: 100px;
+}
+input[type=range]::-moz-focus-inner {
+  border:0;
+  outline:0;
+}
+input[type=range]:focus{
+  outline:0;
+}
+input[type=range]::-webkit-slider-runnable-track {
+  width:300px;
+}
+input[type=range]::-moz-range-track {
+  height:4px;
+  border-radius: 3px;
+  background: #a0b5c2;
+}
+input[type=range]::-moz-range-thumb {
+  border: 1px solid #5c6263;
+  height:15px;
+  width:15px;
+  border-radius: 50%;
+  background: #686f71;
+}
+input[type=range]:active::-moz-range-thumb {
+  background: #4399f4;
+  border: #3d8add;
+}
+
+
+.stratovolcano {
+  fill:#8f9baf;
+}
+.caldera {
+  fill:#e2402a;
+}
+.complex {
+  fill:#1bc48d;
+}
+.compound{
+  fill:#87ad2f;
+}
+.lava-dome {
+  fill: #876c52;
+}
+.subglacial {
+  fill: #edfffe;
+}
+.submarine {
+  fill:#0ed5c9;
+}
+.fissure-vent {
+  fill:#ff6329;
+}
+.cone {
+  fill:#615342;
+}
+.pyroclastic-shield {
+  fill:#f99b6c;
+}
+.shield {
+  fill: #752a00;
+}
+.pyroclastic-cone {
+  fill: #171d38;
+}
+.maar {
+  fill: #3174fc;
+}
+.explosion-crater {
+  fill:#4f533a;
+}
+.tuff-cone {
+  fill: #0b7377;
+}
+.crater-row {
+  fill:#e0ca4d;
+}
+.unknown {
+  fill:magenta;
+}
+.lava-cone {
+  fill:#ff0000;
+}
+.volcanic-field {
+  fill:#eda506;
+}
